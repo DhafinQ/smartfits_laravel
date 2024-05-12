@@ -1,12 +1,16 @@
 <?php
 
+use Akaunting\Apexcharts\Chart;
+use App\Http\Controllers\FeedBackController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\FoodNoteController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Carbon;
 use App\Models\Customer;
 use App\Models\Feedback;
 use App\Models\FoodNote;
+use Illuminate\Support\Facades\DB;
 
 /*
 |--------------------------------------------------------------------------
@@ -20,39 +24,30 @@ use App\Models\FoodNote;
 */
 
 Route::get('/', function () {
-    return view('welcome');
+    return view('index');
 });
 
-Route::get('/bruh',function(){
-    try{
-        $date1 = Carbon::today()->subDay(1)->subHour(rand(13,19));
-        $id = Auth::user()->_id;
-        $success = Feedback::create([
-            'user_id' => $id,
-            'keterangan' => "Terdapat Bug Dibagian Form Benambahan Makan Siang, Kalori Yang Dimasukan Tidak Termasuk Kedalam Jumlah Kalori.",
-            'tgl_note' => $date1,
-            'status' => "Proses"
-        ]);
-        $msg = "Note Created!" . $success;
-    }catch(\Exception $e){
-        $msg = "Mongo Server Error. " . $e->getMessage();
-    }
 
-    return ['msg' => $msg];
-
-});
-
-Route::get('/dashboard', function () {
-    $data = FoodNote::where('customer_id','=',Auth::user()->customer->_id)->get(['kalori']);
-    $count = FoodNote::where('customer_id','=',Auth::user()->customer->_id)->count();
-    return view('dashboard',compact('data','count'));
-})->name('dashboard');
 // ->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::get('/profile/plan', [ProfileController::class, 'userPlan'])->name('profile.plan');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+
+    Route::post('/feedback',[FeedBackController::class, 'store'])->name('feedback.store');
+
+    
+    Route::get('/dashboard', [FoodNoteController::class,'dashboard'])->name('dashboard');
+    
+    Route::get('/jadwal-makan/{jadwal?}', [FoodNoteController::class, 'index'])->name('foodnote.index');
+    Route::get('/tambah-makan/{kategori}/{jadwal?}', [FoodNoteController::class, 'create'])->name('foodnote.create');
+    Route::post('/tambah-makan/{kategori}', [FoodNoteController::class, 'store'])->name('foodnote.store');
+    Route::get('/edit-makan/{foodNote}', [FoodNoteController::class, 'edit'])->name('foodnote.edit');
+    Route::patch('/update-makan/{foodNote}', [FoodNoteController::class, 'update'])->name('foodnote.update');
+    Route::delete('/delete-makan/{foodNote}', [FoodNoteController::class, 'destroy'])->name('foodnote.delete');
+
 });
 
 // useless routes

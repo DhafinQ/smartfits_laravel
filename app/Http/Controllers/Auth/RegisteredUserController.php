@@ -36,23 +36,26 @@ class RegisteredUserController extends Controller
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
-            'tipe_aktivitas' => ['required','string']
+            'tipe_aktivitas' => ['required','string'],
+            'jenis_kelamin' => ['required','string'],
+            'tgl_lahir' => ['required']
         ]);
 
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
-            'role' => 'admin',
+            'role' => 'client',
             'password' => Hash::make($request->password),
         ]);
 
         event(new Registered($user));
 
-        // Customer::create([
-        //     'user_id' => $user->_id,
-        //     'tgl_lahir' => Carbon::now()->subYear(rand(12,29))->subMonth(rand(3,9))->subDay(rand(12,24)),
-        //     'tipe_aktivitas' => $request->tipe_aktivitas
-        // ]);
+        $costumer = Customer::create([
+            'user_id' => $user->_id,
+            'tgl_lahir' => Carbon::parse($request->tgl_lahir)->setTimezone(config('app.timezone')),
+            'tipe_aktivitas' => $request->tipe_aktivitas,
+            'jekel' => $request->jenis_kelamin
+        ]);
 
         Auth::login($user);
 

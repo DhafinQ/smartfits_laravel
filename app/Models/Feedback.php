@@ -12,8 +12,8 @@ class Feedback extends Model
 
     protected $connection = 'mongodb';
     protected $collection = 'feedbacks';
-    protected $fillable = ['user_id','keterangan','status','tgl_feedback'];
-    protected $casts = ['tgl_feedback' => 'datetime','user_id' => 'string'];
+    protected $fillable = ['user_id','subjek','keterangan','status'];
+    protected $casts = ['user_id' => 'string'];
 
     public function feedback(){
         return $this->belongsTo(User::class,'user_id','_id');

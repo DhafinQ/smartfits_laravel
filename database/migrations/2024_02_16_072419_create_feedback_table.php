@@ -11,9 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('feedback', function (Blueprint $table) {
-            $table->id();
-            $table->timestamps();
+        Schema::connection('mongodb')->create('feedback',function($collection){
+            $collection->unique('guid');
         });
     }
 

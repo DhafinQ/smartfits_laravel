@@ -4,9 +4,8 @@
         href="{{ route('dashboard') }}"
         class="inline-flex items-center gap-2"
     >
-        <x-application-logo aria-hidden="true" class="w-10 h-auto" />
-
-        <span class="sr-only">Dashboard</span>
+        <x-application-logo aria-hidden="true" class="w-20 h-auto -mb-7" />
+        <span class="-ml-3 font-semibold" x-show="isSidebarOpen || isSidebarHovered">SmartFits</span>
     </a>
 
     <!-- Toggle button -->

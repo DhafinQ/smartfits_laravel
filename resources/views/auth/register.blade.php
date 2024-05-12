@@ -106,22 +106,68 @@
                         />
                     </x-form.input-with-icon-wrapper>
 
-                    
                 </div>
 
-                <!-- Confirm Password -->
+                <div class="space-y-2">
+                    <x-form.label
+                        for="tgl_lahir"
+                        :value="__('Tanggal Lahir')"
+                    />
+                    <x-form.input
+                        id="tgl_lahir"
+                        class="block w-full dark:[color-scheme:dark]"
+                        type="date"
+                        name="tgl_lahir"
+                        required
+                    />
+
+                </div>
+
+                <div class="my-1">
+                    <x-form.label 
+                        for="jenis_kelamin"
+                        class="mb-1"
+                        :value="__('Jenis Kelamin')"
+                    />
+
+                    <x-form.radio-selectbox
+                            id="gender_laki"
+                            type="radio"
+                            name="jenis_kelamin"
+                            value="Laki-Laki"
+                            />
+                    <span>Laki-Laki</span>  
+                    <br>
+                    <x-form.radio-selectbox
+                            id="gender_perempuan"
+                            type="radio"
+                            name="jenis_kelamin"
+                            value="Perempuan"
+                            />
+                    <span>Perempuan</span>
+                </div>
+                
+                <!-- Tipe Aktivitas -->
                 <div class="space-y-2">
                     <x-form.label
                         for="tipe_aktivitas"
                         :value="__('Tipe Aktivitas')"
                     />
-                    <x-form.select id="tipe_aktivitas" name="tipe_aktivitas">
+                    <x-form.select id="tipe_aktivitas" name="tipe_aktivitas" class="block w-full">
                         <option value="">- Pilih -</option>
                         <option value="Sangat Aktif">Sangat Aktif</option>
                         <option value="Aktif">Aktif</option>
-                        <option value="Kurang Aktif">Kurang Aktif</option>
+                        <option value="Sedikit Aktif">Sedikit Aktif</option>
                     </x-form.select>
-                    
+                    <p class="space-y-2 text-gray-400 text-justify" id="text_aktivitas1" style="display: none">
+                        {{ __('Kegiatan sehari-hari yang membutuhkan upaya seperti berdiri secara berkala, pekerjaaan rumah, atau latihan ringan') }}
+                    </p>
+                    <p class="space-y-2 text-gray-400 text-justify" id="text_aktivitas2" style="display: none">
+                        {{ __('Kegiatan sehari-hari yang membutuhkan upaya yang wajar seperti berdiri, kerja fisik, olahraga secara teratur') }}
+                    </p>
+                    <p class="space-y-2 text-gray-400 text-justify" id="text_aktivitas3" style="display: none">
+                        {{ __('Kegiatan sehari-hari yang membutuhkan upaya fisik yang tinggi seperti pekerjaan kontruksi atau olahraga berat secara teratur') }}
+                    </p>
                 </div>
 
                 
@@ -144,4 +190,8 @@
             </div>
         </form>
     </x-auth-card>
+    @push('scripts')
+    <script src="{{URL::asset ('js/register.js')}}"></script>
+    @endpush
 </x-guest-layout>
+

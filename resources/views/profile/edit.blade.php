@@ -24,4 +24,8 @@
             </div>
         </div>
     </div>
+
+    @push('scripts')
+    <script src="{{URL::asset ('js/register.js')}}"></script>
+    @endpush
 </x-app-layout>

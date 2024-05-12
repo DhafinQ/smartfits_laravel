@@ -66,6 +66,7 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    @apexchartsScripts
     @stack('scripts')
 </body>
 </html>
