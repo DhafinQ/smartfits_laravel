@@ -11,9 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('food_notes', function (Blueprint $table) {
-            $table->id();
-            $table->timestamps();
+        Schema::connection('mongodb')->create('food_notes',function($collection){
         });
     }
 

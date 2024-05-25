@@ -12,7 +12,6 @@ return new class extends Migration
     public function up(): void
     {
         Schema::connection('mongodb')->create('feedback',function($collection){
-            $collection->unique('guid');
         });
     }
 
