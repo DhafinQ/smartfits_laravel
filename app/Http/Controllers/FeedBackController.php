@@ -49,4 +49,9 @@ class FeedBackController extends Controller
 
         return back()->with('status','feedback-updated');
     }
+
+    public function destroy(Feedback $feedback){
+        $feedback->delete();
+        return back()->with('status','feedback-deleted');
+    }
 }
