@@ -5,7 +5,7 @@
         </h2>
 
         <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">
-            {{ __("Update Profile Akun Sesuai Data Yang Anda Miliki.") }}
+            {{ $user->name ? 'Update Profile User Sesuai Data Yang Anda Ingin Diubah.' : 'Update Profile User Sesuai Data Yang Anda Miliki.' }}
         </p>
     </header>
 
@@ -19,10 +19,8 @@
 
         <div class="space-y-2">
             <x-form.label for="name" :value="__('Name')" />
-
             <x-form.input id="name" name="name" type="text" class="block w-full" :value="old('name', $user->name)"
                 autofocus autocomplete="name" />
-
             <x-form.error :messages="$errors->get('name')" />
         </div>
 
@@ -54,6 +52,7 @@
             @endif
         </div>
 
+        @if (!checkRole())
         <div class="space-y-2">
             <x-form.label for="tgl_lahir" :value="__('Tanggal Lahir')" />
             <x-form.input id="tgl_lahir" class="block w-1/3 dark:[color-scheme:dark]" type="date" name="tgl_lahir"
@@ -61,7 +60,6 @@
 
             <x-form.error :messages="$errors->get('tgl_lahir')" />
         </div>
-
         <div class="my-1">
             <x-form.label for="jekel" class="mb-1" :value="__('Jenis Kelamin')" />
 
@@ -76,7 +74,6 @@
 
             <x-form.error :messages="$errors->get('jekel')" />
         </div>
-
         <!-- Tipe Aktivitas -->
         <div class="space-y-2">
             <x-form.label for="tipe_aktivitas" :value="__('Tipe Aktivitas')" />
@@ -96,6 +93,9 @@
                 {{ __('Kegiatan sehari-hari yang membutuhkan upaya fisik yang tinggi seperti pekerjaan kontruksi atau olahraga berat secara teratur') }}
             </p>
         </div>
+        @endif
+
+
 
         <div class="flex items-center gap-4">
             <x-button>

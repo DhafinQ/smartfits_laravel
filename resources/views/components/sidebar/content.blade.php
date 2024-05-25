@@ -14,6 +14,26 @@
         </x-slot>
     </x-sidebar.link>
 
+    @if (checkRole())
+    <x-sidebar.link
+        title="Users"
+        href="{{ route('users.index') }}"
+        :isActive="request()->routeIs('users.index') || request()->routeIs('users.edit') || request()->routeIs('users.show') || request()->routeIs('users.create')"
+    >
+        <x-slot name="icon">
+            <x-heroicon-o-user-group class="flex-shrink-0 w-6 h-6" aria-hidden="true" />
+        </x-slot>
+    </x-sidebar.link>
+    <x-sidebar.link
+        title="Feedback"
+        href="{{ route('feedback.index') }}"
+        :isActive="Str::startsWith(request()->route()->uri(), 'feedback')"
+    >
+        <x-slot name="icon">
+            <x-heroicon-o-chat-alt class="flex-shrink-0 w-6 h-6" aria-hidden="true" />
+        </x-slot>
+    </x-sidebar.link>
+    @else
     <x-sidebar.link
         title="Jadwal Makan"
         href="{{ route('foodnote.index') }}"
@@ -23,7 +43,20 @@
             <x-heroicon-o-clock class="flex-shrink-0 w-6 h-6" aria-hidden="true" />
         </x-slot>
     </x-sidebar.link>
+    @endif
+    
 
+    @if (checkRole())
+    <x-sidebar.link
+        title="Profile"
+        href="{{ route('profile.edit') }}"
+        :isActive="request()->routeIs('profile.edit')"
+    >
+        <x-slot name="icon">
+            <x-heroicon-o-user-circle class="flex-shrink-0 w-6 h-6" aria-hidden="true" />
+        </x-slot>
+    </x-sidebar.link>
+    @else
     <x-sidebar.dropdown
         title="User"
         :active="Str::startsWith(request()->route()->uri(), 'profile')"
@@ -43,6 +76,8 @@
             :active="request()->routeIs('profile.plan')"
         />
     </x-sidebar.dropdown>
+    @endif
+    
 
     {{-- <div
         x-transition

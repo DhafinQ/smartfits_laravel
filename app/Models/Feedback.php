@@ -15,7 +15,7 @@ class Feedback extends Model
     protected $fillable = ['user_id','subjek','keterangan','status'];
     protected $casts = ['user_id' => 'string'];
 
-    public function feedback(){
+    public function user(){
         return $this->belongsTo(User::class,'user_id','_id');
     }
 

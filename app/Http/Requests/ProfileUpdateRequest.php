@@ -16,12 +16,18 @@ class ProfileUpdateRequest extends FormRequest
      */
     public function rules(): array
     {
+        if(!checkRole()){
+            return [
+                'name' => ['required', 'string', 'max:255'],
+                'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:users,email,' . Auth::user()->id . ',_id'],
+                'tgl_lahir' => ['required', 'date'],
+                'jekel' => ['required', 'string'],
+                'tipe_aktivitas' => ['required', 'string']
+            ];
+        }
         return [
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:users,email,' . Auth::user()->id . ',_id'],
-            'tgl_lahir' => ['required', 'date'],
-            'jekel' => ['required', 'string'],
-            'tipe_aktivitas' => ['required', 'string']
         ];
     }
 

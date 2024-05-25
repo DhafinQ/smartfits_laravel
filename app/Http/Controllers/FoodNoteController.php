@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use Akaunting\Apexcharts\Chart;
 use App\Models\FoodNote;
+use App\Models\Feedback;
+use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -12,70 +14,76 @@ use Illuminate\Support\Facades\Redirect;
 class FoodNoteController extends Controller
 {
     public function dashboard(){
-        $data = FoodNote::where('customer_id', '=', Auth::user()->customer->_id)->get(['kalori']);
-        $count = FoodNote::where('customer_id', '=', Auth::user()->customer->_id)->count();
+        if(checkRole()){
+            $customerCount = User::where('role','=','client')->get()->count();
+            $feedbackCount = Feedback::all()->count();
+            $feedbacks = Feedback::orderBy('created_at','desc')->take(10)->get();
+            return view('dashboard',compact('customerCount','feedbackCount','feedbacks'));
+        }else{
+            $data = FoodNote::where('customer_id', '=', Auth::user()->customer->_id)->get(['kalori']);
+            $count = FoodNote::where('customer_id', '=', Auth::user()->customer->_id)->count();
 
-        $QPagi = FoodNote::where('customer_id', '=', Auth::user()->customer->_id)->where('jadwal_makan', '=', 'pagi')->whereDate('tgl_note', '=', Carbon::now());
-        $QSiang = FoodNote::where('customer_id', '=', Auth::user()->customer->_id)->where('jadwal_makan', '=', 'siang')->whereDate('tgl_note', '=', Carbon::now());
-        $QMalam = FoodNote::where('customer_id', '=', Auth::user()->customer->_id)->where('jadwal_makan', '=', 'malam')->whereDate('tgl_note', '=', Carbon::now());
-        $totalKal = FoodNote::where('customer_id', '=', Auth::user()->customer->_id)->whereDate('tgl_note', '=', Carbon::now())->sum('kalori');
+            $QPagi = FoodNote::where('customer_id', '=', Auth::user()->customer->_id)->where('jadwal_makan', '=', 'pagi')->whereDate('tgl_note', '=', Carbon::now());
+            $QSiang = FoodNote::where('customer_id', '=', Auth::user()->customer->_id)->where('jadwal_makan', '=', 'siang')->whereDate('tgl_note', '=', Carbon::now());
+            $QMalam = FoodNote::where('customer_id', '=', Auth::user()->customer->_id)->where('jadwal_makan', '=', 'malam')->whereDate('tgl_note', '=', Carbon::now());
+            $totalKal = FoodNote::where('customer_id', '=', Auth::user()->customer->_id)->whereDate('tgl_note', '=', Carbon::now())->sum('kalori');
+            $startDate = Carbon::now()->subWeek(); 
+            $endDate = Carbon::now(); 
 
-        $startDate = Carbon::now()->subWeek(); 
-        $endDate = Carbon::now(); 
+            $foodEntries = FoodNote::whereBetween('tgl_note', [$startDate, $endDate])
+                ->orderBy('tgl_note')
+                ->get()
+                ->groupBy(function ($entry) {
+                    return Carbon::parse($entry->tgl_note)->format('Y-m-d');
+                });
 
-        $foodEntries = FoodNote::whereBetween('tgl_note', [$startDate, $endDate])
-            ->orderBy('tgl_note')
-            ->get()
-            ->groupBy(function ($entry) {
-                return Carbon::parse($entry->tgl_note)->format('Y-m-d');
-            });
+            $caloriesByDate = [];
+            foreach ($foodEntries as $date => $entries) {
+                $caloriesByDate[Carbon::parse($date)->settings(['formatFunction' => 'translatedFormat'])->format('l, j F Y')] = $entries->sum('kalori');
+            }
+            $target_kalori = array_fill(0,count($caloriesByDate),Auth::user()->customer->getCalories());
+            
+            $dateLabel = [];
+            foreach ($caloriesByDate as $key => $value) {
+                array_push($dateLabel,$key);
+            }
 
-        $caloriesByDate = [];
-        foreach ($foodEntries as $date => $entries) {
-            $caloriesByDate[Carbon::parse($date)->settings(['formatFunction' => 'translatedFormat'])->format('l, j F Y')] = $entries->sum('kalori');
+            $chart = (new Chart)->setType('line')
+                ->setWidth('100%')
+                ->setHeight(300)
+                ->setTooltipFillSeriesColor(true)
+                ->setColor('#4ECDC4')
+                ->setStrokeColors(['#4ECDC4','#90EE7E'])
+                ->setMarkersColors(['#4ECDC4','#90EE7E'])
+                ->setTooltipTheme('dark')
+                ->setYaxisMin(0)
+                ->setYaxisTitle(['text' => 'Kalori (Kkal)'])
+                ->setSubtitle('')
+                ->setTooltipX(['show' => false])
+                ->setSeries([
+                    [
+                        'name' => 'Target Kalori',
+                        'data' => $target_kalori
+                    ],
+                    [
+                        'name' => 'Konsumsi Kalori',
+                        'data' => array_values($caloriesByDate)
+                    ]
+                ])
+                ->setLabels($dateLabel);
+
+            $chart2 = (new Chart)->setType('donut')
+                ->setWidth('100%')
+                ->setHeight(300)
+                ->setSubtitle('')
+                ->setDataLabelsEnabled(true)
+                ->setLegendShow(true)
+                ->setLegendPosition('bottom')
+                ->setLabels(['Makan Pagi', 'Makan Siang', 'Makan Malam'])
+                ->setDataset('Kalori (Kkal)', 'donut', [$QPagi->sum('kalori'), $QSiang->sum('kalori'), $QMalam->sum('kalori')]);
+
+            return view('dashboard', compact('data', 'count', 'chart', 'chart2', 'totalKal'));
         }
-        $target_kalori = array_fill(0,count($caloriesByDate),Auth::user()->customer->getCalories());
-        
-        $dateLabel = [];
-        foreach ($caloriesByDate as $key => $value) {
-            array_push($dateLabel,$key);
-        }
-
-        $chart = (new Chart)->setType('line')
-            ->setWidth('100%')
-            ->setHeight(300)
-            ->setTooltipFillSeriesColor(true)
-            ->setColor('#4ECDC4')
-            ->setStrokeColors(['#4ECDC4','#90EE7E'])
-            ->setMarkersColors(['#4ECDC4','#90EE7E'])
-            ->setTooltipTheme('dark')
-            ->setYaxisMin(0)
-            ->setYaxisTitle(['text' => 'Kalori (Kkal)'])
-            ->setSubtitle('')
-            ->setTooltipX(['show' => false])
-            ->setSeries([
-                [
-                    'name' => 'Target Kalori',
-                    'data' => $target_kalori
-                ],
-                [
-                    'name' => 'Konsumsi Kalori',
-                    'data' => array_values($caloriesByDate)
-                ]
-            ])
-            ->setLabels($dateLabel);
-
-        $chart2 = (new Chart)->setType('donut')
-            ->setWidth('100%')
-            ->setHeight(300)
-            ->setSubtitle('')
-            ->setDataLabelsEnabled(true)
-            ->setLegendShow(true)
-            ->setLegendPosition('bottom')
-            ->setLabels(['Makan Pagi', 'Makan Siang', 'Makan Malam'])
-            ->setDataset('Kalori (Kkal)', 'donut', [$QPagi->sum('kalori'), $QSiang->sum('kalori'), $QMalam->sum('kalori')]);
-
-        return view('dashboard', compact('data', 'count', 'chart', 'chart2', 'totalKal'));
     }
 
     /**

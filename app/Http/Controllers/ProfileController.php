@@ -28,20 +28,22 @@ class ProfileController extends Controller
     public function update(ProfileUpdateRequest $request): RedirectResponse
     {
         $request->user()->fill($request->validated());
-        
         if ($request->user()->isDirty('email')) {
             $request->user()->email_verified_at = null;
         }
         $request->user()->save();
-        $dataCustomer = [
-            'tipe_aktivitas' => $request->tipe_aktivitas,
-            'jekel' => $request->jekel,
-            'tgl_lahir' => $request->tgl_lahir
-        ];
 
-        $customer = Customer::findOrFail(Auth::user()->customer->id);
-
-        $customer->update($dataCustomer);
+        if(!checkRole()){
+            $dataCustomer = [
+                'tipe_aktivitas' => $request->tipe_aktivitas,
+                'jekel' => $request->jekel,
+                'tgl_lahir' => $request->tgl_lahir
+            ];
+    
+            $customer = Customer::findOrFail(Auth::user()->customer->id);
+    
+            $customer->update($dataCustomer);
+        }
 
         return Redirect::route('profile.edit')->with('status', 'profile-updated');
     }

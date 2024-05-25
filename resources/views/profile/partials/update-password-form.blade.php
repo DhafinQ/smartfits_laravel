@@ -16,7 +16,9 @@
     >
         @csrf
         @method('put')
-
+        @if (!empty($L_user->name))
+            <input type="hidden" name="user_id" value="{{$L_user->id}}">
+        @else
         <div class="space-y-2">
             <x-form.label
                 for="current_password"
@@ -33,6 +35,7 @@
 
             <x-form.error :messages="$errors->updatePassword->get('current_password')" />
         </div>
+        @endif
 
         <div class="space-y-2">
             <x-form.label
@@ -49,6 +52,11 @@
             />
 
             <x-form.error :messages="$errors->updatePassword->get('password')" />
+            @if ($errors->any())
+            @foreach ($errors->all() as $error)
+            <x-form.error :messages="$error" />
+            @endforeach
+            @endif
         </div>
 
         <div class="space-y-2">
@@ -66,6 +74,7 @@
             />
 
             <x-form.error :messages="$errors->updatePassword->get('password_confirmation')" />
+                
         </div>
 
         <div class="flex items-center gap-4">
