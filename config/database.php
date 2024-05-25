@@ -37,7 +37,7 @@ return [
 
         'mongodb' => [
             'driver' => 'mongodb',
-            'dsn' => env('MONGODB_URI','mongodb+srv://dhafinqintarakh:nP2ak5ugMNzhNwDM@cluster0.mppvgzf.mongodb.net/?retryWrites=true&w=majority'),
+            'dsn' => env('MONGODB_URI'),
             'database' => 'smartfits'
         ],
 
