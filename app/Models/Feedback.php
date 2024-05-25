@@ -11,7 +11,7 @@ class Feedback extends Model
     use HasFactory;
 
     protected $connection = 'mongodb';
-    protected $collection = 'feedbacks';
+    protected $collection = 'feedback';
     protected $fillable = ['user_id','subjek','keterangan','status'];
     protected $casts = ['user_id' => 'string'];
 
